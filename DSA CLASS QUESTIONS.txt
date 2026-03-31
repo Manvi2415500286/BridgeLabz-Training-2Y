@@ -1,0 +1,356 @@
+DSA CLASS QUESTIONS
+
+1. implementation of circular queue using list
+solution:
+import java.util.*;
+
+public class Main {
+    static int[] q;
+    static int front = -1, rear = -1, size;
+
+    static void enqueue(int x) {
+        if ((rear + 1) % size == front) {
+            System.out.println("Queue Full");
+            return;
+        }
+        if (front == -1) front = 0;
+        rear = (rear + 1) % size;
+        q[rear] = x;
+    }
+
+    static void dequeue() {
+        if (front == -1) {
+            System.out.println("Queue Empty");
+            return;
+        }
+        System.out.println("Deleted: " + q[front]);
+        if (front == rear) front = rear = -1;
+        else front = (front + 1) % size;
+    }
+
+    static void display() {
+        if (front == -1) {
+            System.out.println("Queue Empty");
+            return;
+        }
+        int i = front;
+        System.out.print("Queue: ");
+        while (true) {
+            System.out.print(q[i] + " ");
+            if (i == rear) break;
+            i = (i + 1) % size;
+        }
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        size = 5;
+        q = new int[size];
+
+        enqueue(10);
+        enqueue(20);
+        enqueue(30);
+        enqueue(40);
+        enqueue(50);
+
+        display();
+
+        dequeue();
+        dequeue();
+
+        enqueue(60);
+        enqueue(70);
+
+        display();
+    }
+}
+2. reverse a queue using recursion
+solution:
+import java.util.*;
+
+public class Main {
+
+    // Function to reverse queue using recursion
+    static void reverseQueue(Queue<Integer> q) {
+        if (q.isEmpty())
+            return;
+
+        int x = q.remove();   // remove front element
+        reverseQueue(q);      // recursive call
+        q.add(x);             // add element at rear
+    }
+
+    public static void main(String[] args) {
+        Queue<Integer> q = new LinkedList<>();
+
+        q.add(10);
+        q.add(20);
+        q.add(30);
+        q.add(40);
+
+        System.out.println("Original Queue: " + q);
+
+        reverseQueue(q);
+
+        System.out.println("Reversed Queue: " + q);
+    }
+}
+3.Program of count a distinct difference between max element of every subarray.
+solution :
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        int[] arr = {1, 2, 3};
+        int n = arr.length;
+        int sum = 0;
+
+        // Generate all subarrays
+        for (int i = 0; i < n; i++) {
+            int max = arr[i];
+            int min = arr[i];
+
+            for (int j = i; j < n; j++) {
+                // Update max and min
+                if (arr[j] > max) max = arr[j];
+                if (arr[j] < min) min = arr[j];
+
+                sum += (max - min);
+            }
+        }
+
+        System.out.println("Sum of differences: " + sum);
+    }
+}
+4. Implementation of dequeue using double linked list.
+solution:
+import java.util.Scanner;
+
+public class Main {
+
+    static class Node {
+        int data;
+        Node prev, next;
+
+        Node(int d) {
+            data = d;
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        Node front = null, rear = null;
+        int ch, x;
+
+        do {
+            System.out.println("\n1.Insert Front  2.Insert Rear  3.Delete Front  4.Delete Rear  5.Display  6.Exit");
+            ch = sc.nextInt();
+
+            switch (ch) {
+
+                case 1: // Insert Front
+                    System.out.print("Enter value: ");
+                    x = sc.nextInt();
+                    Node n1 = new Node(x);
+
+                    if (front == null)
+                        front = rear = n1;
+                    else {
+                        n1.next = front;
+                        front.prev = n1;
+                        front = n1;
+                    }
+                    break;
+
+                case 2: // Insert Rear
+                    System.out.print("Enter value: ");
+                    x = sc.nextInt();
+                    Node n2 = new Node(x);
+
+                    if (rear == null)
+                        front = rear = n2;
+                    else {
+                        rear.next = n2;
+                        n2.prev = rear;
+                        rear = n2;
+                    }
+                    break;
+
+                case 3: // Delete Front
+                    if (front == null)
+                        System.out.println("Deque Empty");
+                    else {
+                        System.out.println("Deleted: " + front.data);
+                        front = front.next;
+                        if (front != null)
+                            front.prev = null;
+                        else
+                            rear = null;
+                    }
+                    break;
+
+                case 4: // Delete Rear
+                    if (rear == null)
+                        System.out.println("Deque Empty");
+                    else {
+                        System.out.println("Deleted: " + rear.data);
+                        rear = rear.prev;
+                        if (rear != null)
+                            rear.next = null;
+                        else
+                            front = null;
+                    }
+                    break;
+
+                case 5: // Display
+                    if (front == null)
+                        System.out.println("Deque Empty");
+                    else {
+                        Node t = front;
+                        while (t != null) {
+                            System.out.print(t.data + " ");
+                            t = t.next;
+                        }
+                        System.out.println();
+                    }
+                    break;
+            }
+
+        } while (ch != 6);
+
+        sc.close();
+    }
+}
+5. leetcode question 641, 232,1438 and 225
+solution:
+class MyCircularDeque {
+    int[] arr;
+    int front, rear, size, k;
+
+    public MyCircularDeque(int k) {
+        this.k = k;
+        arr = new int[k];
+        front = 0;
+        rear = -1;
+        size = 0;
+    }
+
+    public boolean insertFront(int value) {
+        if (isFull()) return false;
+        front = (front - 1 + k) % k;
+        arr[front] = value;
+        size++;
+        return true;
+    }
+
+    public boolean insertLast(int value) {
+        if (isFull()) return false;
+        rear = (rear + 1) % k;
+        arr[rear] = value;
+        size++;
+        return true;
+    }
+
+    public boolean deleteFront() {
+        if (isEmpty()) return false;
+        front = (front + 1) % k;
+        size--;
+        return true;
+    }
+
+    public boolean deleteLast() {
+        if (isEmpty()) return false;
+        rear = (rear - 1 + k) % k;
+        size--;
+        return true;
+    }
+
+    public int getFront() {
+        if (isEmpty()) return -1;
+        return arr[front];
+    }
+
+    public int getRear() {
+        if (isEmpty()) return -1;
+        return arr[rear];
+    }
+
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    public boolean isFull() {
+        return size == k;
+    }
+}
+6. Implement Queue using Stacks
+solution:
+import java.util.Stack;
+
+class MyQueue {
+    Stack<Integer> in = new Stack<>();
+    Stack<Integer> out = new Stack<>();
+
+    public MyQueue() {}
+
+    public void push(int x) {
+        in.push(x);
+    }
+
+    public int pop() {
+        if (out.isEmpty()) {
+            while (!in.isEmpty())
+                out.push(in.pop());
+        }
+        return out.pop();
+    }
+
+    public int peek() {
+        if (out.isEmpty()) {
+            while (!in.isEmpty())
+                out.push(in.pop());
+        }
+        return out.peek();
+    }
+
+    public boolean empty() {
+        return in.isEmpty() && out.isEmpty();
+    }
+}
+7. LeetCode 1438 – Longest Continuous Subarray With Absolute Diff ≤ Limit
+solution:
+import java.util.*;
+
+class Solution {
+    public int longestSubarray(int[] nums, int limit) {
+        Deque<Integer> maxD = new LinkedList<>();
+        Deque<Integer> minD = new LinkedList<>();
+        
+        int left = 0, ans = 0;
+
+        for (int right = 0; right < nums.length; right++) {
+
+            // maintain max deque
+            while (!maxD.isEmpty() && nums[maxD.peekLast()] < nums[right])
+                maxD.pollLast();
+            maxD.offerLast(right);
+
+            // maintain min deque
+            while (!minD.isEmpty() && nums[minD.peekLast()] > nums[right])
+                minD.pollLast();
+            minD.offerLast(right);
+
+            // shrink window
+            while (nums[maxD.peekFirst()] - nums[minD.peekFirst()] > limit) {
+                if (maxD.peekFirst() == left) maxD.pollFirst();
+                if (minD.peekFirst() == left) minD.pollFirst();
+                left++;
+            }
+
+            ans = Math.max(ans, right - left + 1);
+        }
+
+        return ans;
+    }
+}

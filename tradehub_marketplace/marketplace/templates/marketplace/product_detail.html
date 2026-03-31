@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} — TradeHub{% endblock %}
+{% block content %}
+<div class="container page">
+  <a href="{% url 'product_list' %}" class="btn btn-secondary btn-sm mb-3">← Back to Marketplace</a>
+  <div class="grid-2" style="align-items:start">
+    <div>
+      <div style="background:var(--surface2);border-radius:16px;padding:40px;text-align:center;font-size:80px;margin-bottom:20px">
+        {% if product.category %}{{ product.category.icon }}{% else %}📦{% endif %}
+      </div>
+      <div class="card">
+        <div class="text-muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Seller</div>
+        <div style="font-weight:600;font-size:16px;color:#60a5fa">🏪 {{ product.seller.username }}</div>
+        {% if product.category %}
+        <div class="divider"></div>
+        <div class="text-muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Category</div>
+        <span class="badge badge-blue">{{ product.category.icon }} {{ product.category.name }}</span>
+        {% endif %}
+      </div>
+    </div>
+    <div>
+      <h1 style="font-size:32px;font-weight:800;margin-bottom:12px">{{ product.name }}</h1>
+      <div style="font-size:36px;font-weight:800;color:#10b981;font-family:'Syne',sans-serif;margin-bottom:20px">${{ product.price }}</div>
+      <div class="card mb-2">
+        <p style="line-height:1.7;color:var(--muted)">{{ product.description }}</p>
+      </div>
+      <div class="flex gap-3 mb-3">
+        <div class="stat-card" style="flex:1;text-align:center">
+          <div class="stat-value" style="font-size:20px">{{ product.stock }}</div>
+          <div class="stat-label">In Stock</div>
+        </div>
+        <div class="stat-card" style="flex:1;text-align:center">
+          <div class="stat-value" style="font-size:20px">
+            <span class="badge {% if product.status == 'active' %}badge-green{% else %}badge-gray{% endif %}">{{ product.status }}</span>
+          </div>
+          <div class="stat-label">Status</div>
+        </div>
+      </div>
+
+      {% if product.status == 'active' and product.seller != user %}
+        {% if user.profile.can_buy %}
+        <form method="post" action="{% url 'buy_product' product.pk %}">
+          {% csrf_token %}
+          <div class="form-group">
+            <label>Quantity</label>
+            <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="form-control">
+          </div>
+          <div class="card card-sm mb-2" style="background:rgba(16,185,129,.05);border-color:rgba(16,185,129,.2)">
+            <div class="flex-between">
+              <span class="text-muted">Your Balance:</span>
+              <span style="font-weight:700;color:#00d4ff">${{ user.profile.balance }}</span>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-green" style="width:100%;justify-content:center;font-size:16px;padding:12px">
+            🛒 Buy Now
+          </button>
+        </form>
+        {% else %}
+        <div class="alert alert-info">You need a buyer account to purchase products.</div>
+        {% endif %}
+      {% elif product.seller == user %}
+        <div class="alert alert-info">This is your own listing.</div>
+      {% else %}
+        <div class="alert alert-error">This product is not available for purchase.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

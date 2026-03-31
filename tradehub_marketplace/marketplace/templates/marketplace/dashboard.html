@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — TradeHub{% endblock %}
+{% block content %}
+<div class="container page">
+  <div class="flex-between mb-3">
+    <div>
+      <h1 style="font-size:28px;font-weight:800">Welcome back, {{ user.username }} 👋</h1>
+      <p class="text-muted" style="margin-top:4px">
+        {% if profile.role == 'buyer' %}Buyer Account{% elif profile.role == 'seller' %}Seller Account{% else %}Buyer & Seller Account{% endif %}
+        {% if profile.is_verified %} · <span style="color:#10b981">✔ Verified</span>{% endif %}
+      </p>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:13px;color:var(--muted)">Wallet Balance</div>
+      <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#00d4ff">${{ profile.balance }}</div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid-4 mb-3">
+    {% if profile.can_sell %}
+    <div class="stat-card">
+      <div class="stat-value text-green">${{ total_sales|default:"0" }}</div>
+      <div class="stat-label">💰 Total Sales Revenue</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" style="color:#f59e0b">{{ pending_sales }}</div>
+      <div class="stat-label">⏳ Pending Orders</div>
+    </div>
+    {% endif %}
+    {% if profile.can_buy %}
+    <div class="stat-card">
+      <div class="stat-value text-red">${{ total_spent|default:"0" }}</div>
+      <div class="stat-label">🛒 Total Spent</div>
+    </div>
+    {% endif %}
+    <div class="stat-card">
+      <div class="stat-value text-accent">{{ recent_transactions|length }}</div>
+      <div class="stat-label">📋 Recent Transactions</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Left: Seller Products -->
+    {% if profile.can_sell and my_products %}
+    <div>
+      <div class="flex-between mb-2">
+        <div class="section-title" style="margin-bottom:0">🏪 My Listings</div>
+        <a href="{% url 'product_create' %}" class="btn btn-primary btn-sm">+ Add Product</a>
+      </div>
+      <div class="card">
+        {% for product in my_products %}
+        <div class="flex-between" style="padding:12px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-weight:600;font-size:14px">{{ product.name }}</div>
+            <div class="text-muted" style="font-size:12px">Stock: {{ product.stock }}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="color:#10b981;font-weight:700">${{ product.price }}</div>
+            <span class="badge {% if product.status == 'active' %}badge-green{% elif product.status == 'sold' %}badge-blue{% else %}badge-gray{% endif %}">{{ product.status }}</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% elif profile.can_sell %}
+    <div>
+      <div class="section-title">🏪 My Listings</div>
+      <div class="card" style="text-align:center;padding:40px">
+        <div style="font-size:40px;margin-bottom:12px">📦</div>
+        <p class="text-muted" style="margin-bottom:16px">No products listed yet</p>
+        <a href="{% url 'product_create' %}" class="btn btn-primary">List Your First Product</a>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Right: Recent Transactions -->
+    <div>
+      <div class="flex-between mb-2">
+        <div class="section-title" style="margin-bottom:0">📋 Recent Transactions</div>
+        <a href="{% url 'transaction_list' %}" class="btn btn-secondary btn-sm">View All</a>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        {% if recent_transactions %}
+        {% for txn in recent_transactions %}
+        <a href="{% url 'transaction_detail' txn.pk %}" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);text-decoration:none;transition:background .2s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
+          <div>
+            <div style="font-weight:600;font-size:14px;color:var(--text)">TXN-{{ txn.pk|stringformat:"06d" }}</div>
+            <div class="text-muted" style="font-size:12px">
+              {% if txn.buyer == user %}Purchased from {{ txn.seller.username }}{% else %}Sold to {{ txn.buyer.username }}{% endif %}
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-weight:700;font-size:14px;{% if txn.buyer == user %}color:#ef4444{% else %}color:#10b981{% endif %}">
+              {% if txn.buyer == user %}-{% else %}+{% endif %}${{ txn.total_amount }}
+            </div>
+            <span class="badge {% if txn.status == 'completed' %}badge-green{% elif txn.status == 'pending' %}badge-yellow{% elif txn.status == 'disputed' %}badge-red{% else %}badge-gray{% endif %}" style="font-size:10px">{{ txn.status }}</span>
+          </div>
+        </a>
+        {% endfor %}
+        {% else %}
+        <div style="text-align:center;padding:40px">
+          <div style="font-size:40px;margin-bottom:12px">📭</div>
+          <p class="text-muted">No transactions yet</p>
+          <a href="{% url 'product_list' %}" class="btn btn-primary" style="margin-top:12px">Browse Products</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

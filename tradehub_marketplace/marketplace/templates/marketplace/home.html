@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}TradeHub — Buy & Sell Anything{% endblock %}
+{% block content %}
+<div style="background:linear-gradient(135deg,#0a0e1a 0%,#111827 50%,#0f172a 100%);border-bottom:1px solid #1f2d40;padding:80px 24px;text-align:center">
+  <div style="max-width:600px;margin:0 auto">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:20px;padding:6px 16px;margin-bottom:24px;font-size:13px;color:#00d4ff">
+      🚀 Multi-role Marketplace Platform
+    </div>
+    <h1 style="font-size:52px;font-weight:800;line-height:1.1;margin-bottom:20px;background:linear-gradient(135deg,#e2e8f0,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
+      Buy. Sell.<br>Trade Smarter.
+    </h1>
+    <p style="font-size:18px;color:#64748b;margin-bottom:36px;line-height:1.6">
+      A role-based marketplace where buyers discover deals and sellers reach customers — all monitored by a powerful admin panel.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a href="{% url 'register' %}" class="btn btn-primary" style="font-size:16px;padding:12px 28px">Get Started Free</a>
+      <a href="{% url 'product_list' %}" class="btn btn-secondary" style="font-size:16px;padding:12px 28px">Browse Products</a>
+    </div>
+  </div>
+</div>
+
+<div class="container page">
+  <div class="grid-3" style="margin-bottom:48px">
+    <div class="card" style="text-align:center;border-color:rgba(59,130,246,.3)">
+      <div style="font-size:40px;margin-bottom:12px">👤</div>
+      <h3 style="color:#60a5fa;margin-bottom:8px">Buyers</h3>
+      <p class="text-muted" style="font-size:14px">Browse products, make purchases with your wallet balance, track your order history.</p>
+    </div>
+    <div class="card" style="text-align:center;border-color:rgba(16,185,129,.3)">
+      <div style="font-size:40px;margin-bottom:12px">🏪</div>
+      <h3 style="color:#34d399;margin-bottom:8px">Sellers</h3>
+      <p class="text-muted" style="font-size:14px">List your products, manage inventory, receive payments directly to your account.</p>
+    </div>
+    <div class="card" style="text-align:center;border-color:rgba(245,158,11,.3)">
+      <div style="font-size:40px;margin-bottom:12px">⚙️</div>
+      <h3 style="color:#fbbf24;margin-bottom:8px">Admin Panel</h3>
+      <p class="text-muted" style="font-size:14px">Full transaction oversight, user management, dispute resolution, and analytics.</p>
+    </div>
+  </div>
+
+  {% if products %}
+  <div class="section-title">🛍️ Featured Products</div>
+  <div class="grid-3">
+    {% for product in products %}
+    <div class="card" style="transition:transform .2s,border-color .2s;cursor:pointer" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(0,212,255,.4)'" onmouseout="this.style.transform='';this.style.borderColor='#1f2d40'">
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px">
+        {% if product.category %}<span class="badge badge-blue">{{ product.category.icon }} {{ product.category.name }}</span>{% endif %}
+        <span style="color:#10b981;font-family:'Syne',sans-serif;font-weight:700;font-size:18px">${{ product.price }}</span>
+      </div>
+      <h3 style="font-size:16px;margin-bottom:8px">{{ product.name }}</h3>
+      <p class="text-muted" style="font-size:13px;margin-bottom:16px">{{ product.description|truncatechars:80 }}</p>
+      <div class="flex-between">
+        <span class="text-muted" style="font-size:12px">by {{ product.seller.username }}</span>
+        <a href="{% url 'product_detail' product.pk %}" class="btn btn-secondary btn-sm">View →</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
